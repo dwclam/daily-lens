@@ -7,9 +7,12 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
-import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
-import { ConfigService, ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshJwtStrategy } from './strategies/refresh.strategy';
+import refreshJwtConfig from 'src/config/refresh-jwt.config';
+import jwtConfig from 'src/config/jwt.config';
 
 @Module({
   imports: [
@@ -17,19 +20,17 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     TypeOrmModule.forFeature([User]),
     UserModule,
     PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) : Promise<JwtModuleOptions> => ({
-       
-        secret: configService.get<string>('JWT_SECRET') || 'default_secret',
-        signOptions: {
-          expiresIn: parseInt(configService.get<string>('JWT_EXPIRATION') ||'600')
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+    ConfigModule.forFeature(jwtConfig),
+    ConfigModule.forFeature(refreshJwtConfig),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy,JwtStrategy,UserService],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    RefreshJwtStrategy,
+    UserService,
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}
