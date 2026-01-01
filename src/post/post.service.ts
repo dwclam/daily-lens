@@ -22,16 +22,36 @@ export class PostsService {
     return await this.postsRepository.save(newPost);
   }
 
-  // 2. LẤY TẤT CẢ (NEWSFEED)
   async findAll() {
     return await this.postsRepository.find({
-      relations: ['user'], // Quan trọng: Lấy kèm thông tin người đăng (để hiện avatar, tên)
+      relations: [
+        'user',
+        'comments',
+        'comments.user',
+        'likes',
+        'likes.user',
+      ],
       select: {
-        // Chỉ lấy các trường cần thiết của User để bảo mật (tránh lộ password)
         user: {
           id: true,
           username: true,
           avatar: true,
+        },
+        comments: {
+          id: true,
+          content: true,
+          createdAt: true,
+          user: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        likes: {
+          id: true,
+          user: {
+            id: true,
+          },
         },
       },
       order: {

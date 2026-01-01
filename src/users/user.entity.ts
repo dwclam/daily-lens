@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { Role } from '../roles/role.enum';
 import { Posts } from '../post/post.entity';
+import { Comment } from '../comment/comment.entity';
+import { Likes } from '../like/like.entity';
 
 
 @Entity('users')
@@ -46,6 +48,12 @@ export class User {
   createdAt: Date;
   @OneToMany(() => Posts, (post) => post.user)
   posts: Posts[];
+
+  @OneToMany(()=> Comment, (comment) => comment.user)
+  comments: Comment[];
+
+  @OneToMany(()=> Likes, (likes) => likes.user)
+  likes: Likes[];
 
   @BeforeInsert()
   async hashPassword() {
