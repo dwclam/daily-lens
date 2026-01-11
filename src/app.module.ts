@@ -8,6 +8,9 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './post/post.module';
+import { CommentsModule } from './comment/comment.module';
+import { LikesModule } from './like/like.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { PostsModule } from './post/post.module';
     UserModule,
     PostsModule,
     AuthModule,
+    CommentsModule,
+    LikesModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

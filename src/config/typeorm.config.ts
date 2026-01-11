@@ -46,7 +46,7 @@ export default registerAs(
     // Vì DB trên Neon đang trống trơn, nếu bạn để synchronize: false
     // và chưa có file migration nào trong folder, thì app sẽ chạy nhưng KHÔNG có bảng nào được tạo.
     // Lần đầu chạy, bạn nên để true, hoặc chắc chắn rằng folder migrations đã có file.
-    synchronize: false,
+    synchronize: true,
 
     migrationsRun: true,
     migrations: [join(__dirname, '../database/migrations/*{.ts,.js}')],

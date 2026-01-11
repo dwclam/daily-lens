@@ -11,6 +11,7 @@ import { Role } from '../roles/role.enum';
 import { Posts } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 import { Likes } from '../like/like.entity';
+import { Follow } from '../follow/follow.entity';
 
 
 @Entity('users')
@@ -44,6 +45,12 @@ export class User {
   })
   role: Role;
 
+  @Column({ default: 0 })
+  followersCount: number;
+
+  @Column({ default: 0 })
+  followingCount: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
   @OneToMany(() => Posts, (post) => post.user)
@@ -54,6 +61,12 @@ export class User {
 
   @OneToMany(()=> Likes, (likes) => likes.user)
   likes: Likes[];
+
+  @OneToMany(() => Follow, (follow) => follow.following)
+  followers: Follow[];
+
+  @OneToMany(() => Follow, (follow) => follow.follower)
+  following: Follow[];
 
   @BeforeInsert()
   async hashPassword() {

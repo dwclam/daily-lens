@@ -24,6 +24,7 @@ export class PostsService {
 
   async findAll() {
     return await this.postsRepository.find({
+      where: { isPublic : true},
       relations: [
         'user',
         'comments',
@@ -96,5 +97,26 @@ export class PostsService {
     }
 
     return await this.postsRepository.remove(post);
+  }
+
+  // nguoi dung click vao bai viet
+  async markAsChecked(postId: number, userId: number) {
+
+    const post = await this.postsRepository.findOne({ where: { id: postId }, relations: ['user'] });
+
+    if (post && post.user.id === userId) {
+      return this.postsRepository.update(postId, { isChecked: true });
+    }
+  }
+
+  async findUncheckedPosts(userId: number) {
+    return this.postsRepository.find({
+      where: {
+        user: { id: userId }, // Bài của tôi
+        isChecked: false      // Chưa check (có tương tác mới)
+      },
+      order: { updatedAt: 'DESC' }, // Mới nhất lên đầu
+      take: 5 // Lấy 5 bài thôi
+    });
   }
 }

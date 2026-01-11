@@ -30,16 +30,22 @@ export class LikesService {
 
     if (existingLike) {
       // unlike
+
       await this.likesRepository.remove(existingLike);
-      return { status: 'unliked', message: 'Đã bỏ thích' };
+      post.likeCount = post.likeCount - 1;
+      await this.postsRepository.save(post);
+      return { status: 'unliked', message: 'Đã bỏ thích', likeCount: post.likeCount };
     } else {
       // like
       const newLike = this.likesRepository.create({
         user: user,
         post: post,
       });
+
       await this.likesRepository.save(newLike);
-      return { status: 'liked', message: 'Đã thích' };
+      post.likeCount = post.likeCount + 1;
+      await this.postsRepository.save(post);
+      return { status: 'liked', message: 'Đã thích', likeCount: post.likeCount };
     }
   }
 }

@@ -16,6 +16,8 @@ interface RequestWithUser extends Request {
   user: {
     id: number;
     email: string;
+    username: string;
+    avatar: string;
   };
 }
 
@@ -28,7 +30,7 @@ export class AuthController {
   @Post('login')
   login(@Req() req: RequestWithUser) {
     //const token = await this.authService.login(req.user.id, req.user.email);
-    return this.authService.login(req.user.id, req.user.email);
+    return this.authService.login(req.user.id, req.user.email, req.user.username, req.user.avatar);
   }
 
   @UseGuards(AuthGuard('jwt'))

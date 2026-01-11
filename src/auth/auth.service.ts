@@ -32,14 +32,16 @@ export class AuthService {
     return result;
   }
 
-  login(userId: number, email: string) {
-    const payload: AuthJwtPayload = { sub: userId, email: email };
+  login(userId: number, email: string, username: string, avatar: string) {
+    const payload: AuthJwtPayload = { sub: userId, email: email};
     const token = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
     return {
       id: userId,
       token,
       refreshToken,
+      username : username,
+      avatar : avatar
     };
   }
   refreshToken(userId: number, email: string) {

@@ -18,6 +18,8 @@ export class UserService {
   async findOne(id: number) {
     const user = await this.userRepo.findOne({
       where: { id },
+      select: ['id', 'username', 'avatar', 'bio', 'role', 'createdAt','followersCount',
+        'followingCount']
     });
     if (!user) {
       throw new NotFoundException('User with ID =  ' + id + ' not found ');
@@ -26,18 +28,24 @@ export class UserService {
   }
 
   async findAll() {
-    return this.userRepo.find();
+    return this.userRepo.find({
+      select: ['id', 'username', 'avatar', 'bio', 'createdAt','followersCount',
+        'followingCount']
+    });
   }
   async remove(id: number) {
     const user = await this.findOne(id);
     await this.userRepo.remove(user);
   }
 
-  async findByEmail(email: string) {
-    return await this.userRepo.findOne({
+  async findByUser(username: string) {
+    const user = await this.userRepo.findOne({
       where: {
-        email,
+        username: username
       },
     });
+    if (!user) {
+      throw new NotFoundException('User with user =  ' + username + ' not found ')
+    }
   }
 }

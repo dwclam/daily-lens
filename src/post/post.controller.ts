@@ -31,11 +31,11 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-
-    return this.postsService.findOne(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //
+  //   return this.postsService.findOne(id);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
@@ -50,5 +50,17 @@ export class PostsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.postsService.remove(id, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/mark-checked') // API mới: PATCH /posts/1/mark-checked
+  markAsChecked(@Param('id') id: string, @Request() req) {
+    return this.postsService.markAsChecked(parseInt(id), req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-notifications') // GET /posts/my-notifications
+  getMyNotifications(@Request() req) {
+    return this.postsService.findUncheckedPosts(req.user.id);
   }
 }

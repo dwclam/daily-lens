@@ -35,6 +35,9 @@ export class Posts {
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
+  @Column({ default: true }) // Mặc định là True (Đã xem/Không có gì mới)
+  isChecked: boolean;
+
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
