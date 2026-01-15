@@ -11,6 +11,8 @@ import { PostsModule } from './post/post.module';
 import { CommentsModule } from './comment/comment.module';
 import { LikesModule } from './like/like.module';
 import { FollowModule } from './follow/follow.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -18,7 +20,10 @@ import { FollowModule } from './follow/follow.module';
       isGlobal: true,
       load: [appConfig, typeormConfig],
     }),
-
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'), // Trỏ ra thư mục uploads ở gốc dự án
+      serveRoot: '/uploads', // Đường dẫn trên web sẽ bắt đầu bằng /uploads
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

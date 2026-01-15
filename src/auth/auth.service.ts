@@ -30,7 +30,7 @@ export class AuthService {
     const { password, ...result } = user;
 
     return result;
-  }
+  } // tự gắn vào Req user
 
   login(userId: number, email: string, username: string, avatar: string) {
     const payload: AuthJwtPayload = { sub: userId, email: email};

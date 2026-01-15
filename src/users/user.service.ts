@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -18,7 +23,7 @@ export class UserService {
   async findOne(id: number) {
     const user = await this.userRepo.findOne({
       where: { id },
-      select: ['id', 'username', 'avatar', 'bio', 'role', 'createdAt','followersCount',
+      select: ['id', 'username', 'avatar', 'bio', 'createdAt','followersCount',
         'followingCount']
     });
     if (!user) {
@@ -38,14 +43,38 @@ export class UserService {
     await this.userRepo.remove(user);
   }
 
-  async findByUser(username: string) {
-    const user = await this.userRepo.findOne({
+  async findByEmail(email: string) {
+    return await this.userRepo.findOne({
       where: {
-        username: username
+        email,
       },
     });
-    if (!user) {
-      throw new NotFoundException('User with user =  ' + username + ' not found ')
+  }
+  async searchUsers(keyword: string) {
+    if (!keyword) return [];
+
+    return await this.userRepo.find({
+      where: [
+        { username: ILike(`%${keyword}%`) }
+      ],
+      select: ['id', 'username', 'avatar', 'email', 'followersCount']
+    });
+  }
+  async update(id: number, dto: UpdateUserDto, file?: Express.Multer.File) {
+    const user = await this.findOne(id);
+
+    if (dto.username && dto.username !== user.username) {
+      const existingUser = await this.userRepo.findOne({ where: { username: dto.username } });
+      if (existingUser) {
+        throw new ConflictException('Username already exists');
+      }
     }
+    if (file) {
+      const baseUrl = 'http://localhost:3000';
+      const avatarUrl = `${baseUrl}/uploads/${file.filename}`;
+      dto.avatar = avatarUrl;
+    }
+    Object.assign(user, dto);
+    return this.userRepo.save(user);
   }
 }
