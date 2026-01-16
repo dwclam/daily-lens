@@ -22,9 +22,30 @@ export class PostsService {
     return await this.postsRepository.save(newPost);
   }
 
-  async findAll() {
+  async findAll(curUser : User) {
+    if (curUser.role === Role.ADMIN) {
+      return await this.postsRepository.find({
+        relations: [
+          'user',
+          'comments',
+          'comments.user',
+          'likes',
+          'likes.user',
+        ],
+        select: {
+          user: { id: true, username: true, avatar: true },
+          comments: {
+            id: true, content: true, createdAt: true,
+            user: { id: true, username: true, avatar: true }
+          },
+          likes: { id: true, user: { id: true } },
+        },
+        order: { createdAt: 'DESC' },
+      });
+    }
     return await this.postsRepository.find({
-      where: { isPublic : true},
+      where: [{ isPublic : true},
+        {user : {id : curUser.id}}],
       relations: [
         'user',
         'comments',

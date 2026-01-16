@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { RefreshAuthGuard } from './guard/refresh-auth.guard';
+import { Role } from '../roles/role.enum';
 
 interface RequestWithUser extends Request {
   user: {
@@ -18,6 +19,7 @@ interface RequestWithUser extends Request {
     email: string;
     username: string;
     avatar: string;
+    role: Role;
   };
 }
 
@@ -30,7 +32,7 @@ export class AuthController {
   @Post('login')
   login(@Req() req: RequestWithUser) {
     //const token = await this.authService.login(req.user.id, req.user.email);
-    return this.authService.login(req.user.id, req.user.email, req.user.username, req.user.avatar);
+    return this.authService.login(req.user.id, req.user.email, req.user.username, req.user.avatar, req.user.role);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -42,6 +44,6 @@ export class AuthController {
   @UseGuards(RefreshAuthGuard)
   @Post('refresh')
   refreshToken(@Req() req: RequestWithUser) {
-    return this.authService.refreshToken(req.user.id, req.user.email);
+    return this.authService.refreshToken(req.user.id, req.user.email,req.user.role);
   }
 }

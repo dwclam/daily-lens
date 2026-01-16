@@ -6,6 +6,7 @@ import { AuthJwtPayload } from './types/auth-jwt.payload';
 import type { ConfigType } from '@nestjs/config';
 import refreshJwtConfig from '../config/refresh-jwt.config';
 import type refreshJwtConfigType from '../config/refresh-jwt.config';
+import { Role } from '../roles/role.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,8 +33,8 @@ export class AuthService {
     return result;
   } // tự gắn vào Req user
 
-  login(userId: number, email: string, username: string, avatar: string) {
-    const payload: AuthJwtPayload = { sub: userId, email: email};
+  login(userId: number, email: string, username: string, avatar: string, role : Role) {
+    const payload: AuthJwtPayload = { sub: userId, email: email, role: role };
     const token = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
     return {
@@ -41,11 +42,12 @@ export class AuthService {
       token,
       refreshToken,
       username : username,
-      avatar : avatar
+      avatar : avatar,
+      role : role,
     };
   }
-  refreshToken(userId: number, email: string) {
-    const payload: AuthJwtPayload = { sub: userId, email: email };
+  refreshToken(userId: number, email: string, role : Role) {
+    const payload: AuthJwtPayload = { sub: userId, email: email , role: role };
     const token = this.jwtService.sign(payload);
 
     return {

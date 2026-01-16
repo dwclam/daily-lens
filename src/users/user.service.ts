@@ -8,6 +8,7 @@ import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from '../roles/role.enum';
 @Injectable()
 export class UserService {
   constructor(
@@ -75,6 +76,12 @@ export class UserService {
       dto.avatar = avatarUrl;
     }
     Object.assign(user, dto);
+    return this.userRepo.save(user);
+  }
+
+  async updateRole(id: number, role: Role) {
+    const user = await this.findOne(id);
+    user.role = role;
     return this.userRepo.save(user);
   }
 }

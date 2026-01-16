@@ -1,11 +1,10 @@
-import { IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreatePostDto {
-
   @IsString()
-  @IsNotEmpty({ message: 'Image URL cannot be empty' })
+  @IsOptional()
   imageUrl: string;
-
 
   @IsString()
   @IsOptional()
@@ -13,5 +12,11 @@ export class CreatePostDto {
 
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return value;
+  })
   isPublic?: boolean;
 }

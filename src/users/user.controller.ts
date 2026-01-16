@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -24,34 +25,44 @@ import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { RolesGuard } from '../roles/role.guard';
 
 @Controller('user')
-@UseGuards(JwtAuthGuard)
+
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.userService.findAll();
   }
+
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   search(@Query('keyword') keyword: string) {
     return this.userService.searchUsers(keyword);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.userService.findOne(id);
   }
 
-  @Roles(Role.ADMIN)
   @Post()
   async CreateUser(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.userService.remove(id);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar', {
     storage: diskStorage({
@@ -75,4 +86,10 @@ export class UserController {
     return this.userService.update(id, dto, file);
   }
 
+  @Put(':id/role')
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  async updateRole(@Param('id', ParseIntPipe) id: number, @Body('role') role: Role) {
+    return await this.userService.updateRole(id, role);
+  }
 }
